@@ -1,0 +1,37 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledJob
+metadata:
+name: azurebus-consumer
+spec:
+jobTargetRef:
+parallelism: 1      # [max number of desired pods](https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#controlling-parallelism)
+completions: 1      # [desired number of successfully finished pods](https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#controlling-parallelism)
+backoffLimit: 0
+template:
+metadata:
+labels:
+app: kedasampleapp
+spec:
+containers:
+- name: getsbmsg
+image: << Your Image Name >>
+env:
+- name: connectionStringServiceBus
+value: << Your Service Bus Connection String>>
+- name: queueName
+value: << Your Service Bus Queue name>>
+restartPolicy: Never
+pollingInterval: 30           # Optional. Default: 30 seconds
+maxReplicaCount: 12           # Optional. Default: 100
+scalingStrategy:
+strategy: "accurate"          # Optional. Default: default. Which Scaling Strategy to use.
+successfulJobsHistoryLimit: 3 # Optional. Default: 100. How many completed jobs should be kept.
+failedJobsHistoryLimit: 3     # Optional. Default: 100. How many failed jobs should be kept.
+triggers:
+- type: azure-servicebus
+metadata:
+queueName: << Your Service Bus Queue name >>
+messageCount: "1"
+authenticationRef:
+# reference to TriggerAuthentication
+name: azure-servicebus-auth

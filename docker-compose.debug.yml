@@ -1,0 +1,11 @@
+
+version: '3.4'
+
+services:
+  getsbmessage:
+    image: getsbmessage
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - ~/.vsdbg:/remote_debugger:rw
